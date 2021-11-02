@@ -2,17 +2,21 @@
 require "conn.php";
 require "config.php";
 require "api.php";
+require "user_functions.php";
+require "email_sender.php";
 
 $api_key  = isset($_REQUEST['api_key'])  ? $_REQUEST['api_key']  : NULL;
+$action   = isset($_REQUEST['action'])   ? $_REQUEST['action']   : NULL;
 
 $check_api = checkApiKey($api_key);
 
-if($check_api !== false && count($check_api) > 0)
+if($check_api === false || !count($check_api) > 0)
 {
+    echo getStatusJson(2, 7, $action);
     die();
 }
 
-$action   = isset($_REQUEST['action'])   ? $_REQUEST['action']   : NULL;
+$name     = isset($_REQUEST['name'])     ? $_REQUEST['name']     : NULL;
 $email    = isset($_REQUEST['email'])    ? $_REQUEST['email']    : NULL;
 $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : NULL;
 
@@ -21,7 +25,7 @@ $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : NULL;
  * 0: Ok
  * 1: Server error
  * 2: Request error
- */
+*/
 
 $server_error = getStatusJson(1, 1, $action);
 
@@ -34,28 +38,15 @@ switch ($action) {
         }
         else
         {
-            $sql = "
-            SELECT
-                * 
-            FROM 
-                `nous`.`users`
-            WHERE 
-                email = :email
-            ";
-
-            $stmt = Connection::getConn()->prepare($sql);
+            $ret = readUser($email);
     
-            $stmt->bindValue(":email", $email);
-    
-            if($stmt->execute() === false)
+            if($ret === false)
             {
                 echo $server_error;
                 die();
             }
             else
             {
-                $ret = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
                 if(!count($ret) > 0)
                 {
                     echo getStatusJson(2, 4, $action);
@@ -70,31 +61,15 @@ switch ($action) {
                     }
                     else
                     {
-                        $sql = "
-                        SELECT
-                            id,
-                            name,
-                            email,
-                            birth_date,
-                            first_time
-                        FROM 
-                            `nous`.`users`
-                        WHERE
-                            password = :password";
-
-                        $stmt = Connection::getConn()->prepare($sql);
+                        $ret = readUser($email, $password);
                 
-                        $stmt->bindValue(":password", $password);
-                
-                        if($stmt->execute() === false)
+                        if($ret === false)
                         {
                             echo $server_error;
                             die();
                         }
                         else
                         {
-                            $ret = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
                             if(!count($ret) > 0)
                             {
                                 echo getStatusJson(2, 6, $action);
@@ -118,17 +93,81 @@ switch ($action) {
     break;
 
     case "signup":
-        // $sql = "INSERT INTO `nous`.`users` VALUES ()";
-        // $stmt = Connection::getConn()->prepare($sql);
+        // check if email is empty
+        if(empty($email))
+        {
+            echo getStatusJson(2, 3, $action);
+            die();
+        }
+        else
+        {
+            $ret = readUser($email);
 
-        // if($stmt->execute() === false)
-        // {
-        //     false;
-        // }
-        // else
-        // {
-        //     true;
-        // }
+            if($ret === false)
+            {
+                echo $server_error;
+                die();
+            }
+            else
+            {
+                if(count($ret) > 0)
+                {
+                    echo getStatusJson(2, 8, $action);
+                    die();
+                }
+                else
+                {
+                    // check if password is empty
+                    if(empty($password))
+                    {
+                        echo getStatusJson(2, 5, $action);
+                        die();
+                    }
+                    else
+                    {
+                        // check if name is empty
+                        if(empty($name))
+                        {
+                            echo getStatusJson(2, 9, $action);
+                            die();
+                        }
+                        else
+                        {
+                            // create user
+                            $stmt = Connection::getConn();
+                            $stmt->beginTransaction();
+                            // returns email confirmation code
+                            $ret = createUser($stmt, $name, $email, $password);
+
+                            if($ret === false)
+                            {
+                                $stmt->rollBack();
+                                echo $server_error;
+                                die();
+                            }
+                            else
+                            {
+                                // send signup confirmation email
+                                $ret = signUpConfirmation($email, $ret);
+
+                                if($ret === false)
+                                {
+                                    $stmt->rollback();
+                                    echo getStatusJson(1, 10, $action);
+                                    die();
+                                }
+                                else
+                                {
+                                    $stmt->commit();
+                                    echo getStatusJson(0, 0, $action);
+                                    die();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     break;
     
     default:

@@ -1,4 +1,6 @@
 <?php
+const BASE_URL = "10.0.0.194/nous_api/";
+
 function getErrorMessage($error_code)
 {
     switch ($error_code)
@@ -31,6 +33,22 @@ function getErrorMessage($error_code)
             return "Invalid password";
         break;
 
+        case 7:
+            return "Invalid API Key";
+        break;
+
+        case 8:
+            return "Email already exists";
+        break;
+
+        case 9:
+            return "Name not informed";
+        break;
+
+        case 10:
+            return "Confirmation email can't be sented";
+        break;
+
         default:
             return "";
         break;
@@ -48,6 +66,10 @@ function getErrorMessage($error_code)
  * @param int 4 Invalid email
  * @param int 5 Password not informed
  * @param int 6 Invalid password
+ * @param int 7 Invalid API Key
+ * @param int 8 Email already exists
+ * @param int 9 Name not informed
+ * @param int 10 Confirmation email can't be sented
  * @return String
 */
 function getStatusJson($status, $error_code, $action, $json = TRUE)

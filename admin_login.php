@@ -21,7 +21,7 @@ else if($submit)
 
 <!DOCTYPE html>
 <html style="height: 100%; width: 100%" lang="en">
-<head style="height: 100%; width: 100%">
+<head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

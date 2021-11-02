@@ -3,14 +3,14 @@ function checkApiKey($api_key)
 {
     if(!empty($api_key))
     {
-        $sql = "SELECT * FROM `nous`.`users` WHERE api_key = :api_key";
+        $sql = "SELECT * FROM `nous`.`api` WHERE api_key = :api_key";
         $stmt = Connection::getConn()->prepare($sql);
 
         $stmt->bindValue(":api_key", $api_key);
 
         if($stmt->execute() === false)
         {
-            return false;
+            return $stmt->errorInfo();
         }
         else
         {
