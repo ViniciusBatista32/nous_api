@@ -1,4 +1,5 @@
 <?php
+require "config.php";
 require "conn.php";
 require "user_functions.php";
 

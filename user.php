@@ -1,8 +1,9 @@
 <?php
-require "conn.php";
 require "config.php";
+require "conn.php";
 require "api.php";
 require "user_functions.php";
+require "response.php";
 require "email_sender.php";
 
 $api_key  = isset($_REQUEST['api_key'])  ? $_REQUEST['api_key']  : NULL;

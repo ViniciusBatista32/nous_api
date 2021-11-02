@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+require "config.php";
 require "conn.php";
 require "api.php";
 
