@@ -1,11 +1,13 @@
 <?php
+require "config.php";
+
 function readUser($email = NULL, $password = NULL, $confirmation_code = NULL)
 {
     $sql = "
     SELECT
         * 
     FROM 
-        `nous`.`users`
+        `" . DB_NAME . "`.`users`
     WHERE 
         1 = 1
     ";
@@ -46,7 +48,7 @@ function createUser($stmt, $name, $email, $password)
 
     $sql = "
     INSERT INTO
-        `nous`.`users`
+        `" . DB_NAME . "`.`users`
         (name, email, password, confirmation_code)
     VALUES 
         (:name, :email, :password, :confirmation_code)
@@ -73,7 +75,7 @@ function updateUser($confirmation_code)
 {
     $sql = "
     UPDATE 
-        `nous`.`users`
+        `" . DB_NAME . "`.`users`
     SET
         confirmation_code = :new_confirmation_code,
         confirmed = :confirmed
@@ -101,7 +103,7 @@ function deleteUser($confirmation_code)
 {
     $sql = "
     DELETE FROM 
-        `nous`.`users`
+        `" . DB_NAME . "`.`users`
     WHERE 
         confirmation_code = :confirmation_code
     ";
@@ -126,7 +128,7 @@ function checkConfirmationCode($confirmation_code)
     SELECT
         email 
     FROM 
-        `nous`.`users`
+        `" . DB_NAME . "`.`users`
     WHERE 
         confirmation_code = :confirmation_code
     ";

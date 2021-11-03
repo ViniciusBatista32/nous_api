@@ -1,9 +1,11 @@
 <?php
+require "config.php";
+
 function checkApiKey($api_key)
 {
     if(!empty($api_key))
     {
-        $sql = "SELECT * FROM `nous`.`api` WHERE api_key = :api_key";
+        $sql = "SELECT * FROM `" . DB_NAME . "`.`api` WHERE api_key = :api_key";
         $stmt = Connection::getConn()->prepare($sql);
 
         $stmt->bindValue(":api_key", $api_key);
@@ -25,7 +27,7 @@ function checkApiKey($api_key)
 
 function addApiKey($api_key, $app_name, $disabled)
 {
-    $sql = "INSERT INTO `nous`.`api`(`api_key`, `app_name`, `disabled`) VALUES (:api_key, :app_name, :disabled)";
+    $sql = "INSERT INTO `" . DB_NAME . "`.`api`(`api_key`, `app_name`, `disabled`) VALUES (:api_key, :app_name, :disabled)";
     $stmt = Connection::getConn()->prepare($sql);
 
     $stmt->bindValue(":api_key",$api_key);
@@ -44,7 +46,7 @@ function addApiKey($api_key, $app_name, $disabled)
 
 function removeApiKey($id)
 {
-    $sql = "DELETE FROM `nous`.`api` WHERE id = :id ";
+    $sql = "DELETE FROM `" . DB_NAME . "`.`api` WHERE id = :id ";
 
     $stmt = Connection::getConn()->prepare($sql);
 
@@ -62,7 +64,7 @@ function removeApiKey($id)
 
 function listApiKeys($api_key = NULL)
 {
-    $sql = "SELECT * FROM `nous`.`api` ";
+    $sql = "SELECT * FROM `" . DB_NAME . "`.`api` ";
 
     if(!empty($api_key))
         $sql .= " WHERE api_key = :api_key ";
@@ -84,7 +86,7 @@ function listApiKeys($api_key = NULL)
 
 function disableEnableApiKey($id, $action)
 {
-    $sql = "UPDATE `nous`.`api` SET disabled = :action WHERE id = :id";
+    $sql = "UPDATE `" . DB_NAME . "`.`api` SET disabled = :action WHERE id = :id";
 
     $stmt = Connection::getConn()->prepare($sql);
 
