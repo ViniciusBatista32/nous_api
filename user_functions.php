@@ -1,6 +1,4 @@
 <?php
-require "config.php";
-
 function readUser($email = NULL, $password = NULL, $confirmation_code = NULL)
 {
     $sql = "

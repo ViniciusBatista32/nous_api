@@ -1,6 +1,4 @@
 <?php
-require "config.php";
-
 function checkApiKey($api_key)
 {
     if(!empty($api_key))
