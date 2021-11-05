@@ -47,6 +47,14 @@ function getErrorMessage($error_code)
             return "Confirmation email can't be sented";
         break;
 
+        case 11:
+            return "Email not confirmed";
+        break;
+        
+        case 12:
+            return "Reset password email can't be sented";
+        break;
+
         default:
             return "";
         break;
@@ -68,6 +76,8 @@ function getErrorMessage($error_code)
  * @param int 8 Email already exists
  * @param int 9 Name not informed
  * @param int 10 Confirmation email can't be sented
+ * @param int 11 Email not confirmed
+ * @param int 12 Reset password email can't be sented
  * @return String
 */
 function getStatusJson($status, $error_code, $action, $json = TRUE)

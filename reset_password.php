@@ -3,34 +3,37 @@ require "config.php";
 require "functions/conn.php";
 require "functions/functions_user.php";
 
-$confirmation_code = !empty($_REQUEST['confirmation_code']) ? $_REQUEST['confirmation_code'] : NULL;
-$submit            = !empty($_REQUEST['submit'])            ? $_REQUEST['submit']            : NULL;
-$password          = !empty($_REQUEST['password'])          ? $_REQUEST['password']          : NULL;
+$reset_password_code = !empty($_REQUEST['reset_password_code']) ? $_REQUEST['reset_password_code'] : NULL;
+$submit              = !empty($_REQUEST['submit'])              ? $_REQUEST['submit']              : NULL;
+$password            = !empty($_REQUEST['password'])            ? $_REQUEST['password']            : NULL;
+$confirm_password    = !empty($_REQUEST['confirm_password'])    ? $_REQUEST['confirm_password']    : NULL;
 
-$check_confirmation_code = false;
 $invalid_password = false;
+$mismatch_password = false;
 $error = 0;
 
-if(!empty($confirmation_code))
+if(!empty($reset_password_code))
 {
-    $ret = checkConfirmationCode($confirmation_code);
-    if($ret > 0)
-        $check_confirmation_code = true;
+    $ret = checkResetPasswordCode($reset_password_code);
+    if(!$ret > 0)
+        $error = 1;
 }
+else
+    $error = 1;
 
-if($check_confirmation_code && $submit == "submit" && !empty($password))
+if($error == 0 && $submit == "submit" && !empty($password))
 {
-    $ret = readUser(NULL, md5($password), $confirmation_code);
-
-    if(count($ret) > 0)
+    if($password == $confirm_password)
     {
-        $ret = confirmUser($confirmation_code);
-        $error = $ret ? 1 : 2;
+        $ret = resetPassword($reset_password_code, md5($password));
+
+        if(!$ret)
+            $error = 2;
     }
     else
-        $invalid_password = true;
+        $mismatch_password = true;
 }
-else if(empty($password) && $submit == "submit")
+else if($error == 0 && $submit == "submit" && empty($password))
     $invalid_password = true;
 
 ?>
@@ -75,52 +78,61 @@ else if(empty($password) && $submit == "submit")
                         <div class="card p-4 border-0" style="width: 30rem">
                             <div class="card-body">
                                 <?php
-                                if($check_confirmation_code && $error == 0)
+                                if($error == 0 && empty($submit) || $invalid_password || $mismatch_password)
                                 {
                                 ?>
-                                    <h3 class="card-title p-2 text-center">Você está a um passo de ser mais produtivo!</h3>
+                                    <h3 class="card-title p-2 text-center">Redefinir senha</h3>
 
                                     <form method="post">
-                                        <input type="hidden" name="confirmation_code" value="<?php echo !empty($_REQUEST['confirmation_code']) ? $_REQUEST['confirmation_code'] : "" ?>">
+                                        <input type="hidden" name="reset_password_code" value="<?php echo $reset_password_code ?>">
                                         <center>
-                                            <input type="password" name="password" class="form-control" placeholder="Insira a senha do app para liberar o cadastro">
+                                            <input type="password" name="password" class="form-control" placeholder="Insira sua nova senha">
 
                                             <?php
                                             if($invalid_password)
                                             {
                                             ?>
-                                                <p class="mt-1 small text-danger" style="text-align: left">Senha incorreta!</p>
+                                                <p class="mt-1 small text-danger" style="text-align: left">Senha inválida!</p>
                                             <?php
                                             }
                                             ?>
 
-                                            <button type="submit" name="submit" value="submit" class="btn button px-4 mt-3">Confirme seu Cadastro</button>
+                                            <input type="password" name="confirm_password" class="form-control mt-2" placeholder="Confirme sua senha">
+
+                                            <?php
+                                            if($mismatch_password)
+                                            {
+                                            ?>
+                                                <p class="mt-1 small text-danger" style="text-align: left">As senhas não conferem!</p>
+                                            <?php
+                                            }
+                                            ?>
+
+                                            <button type="submit" name="submit" value="submit" class="btn button px-4 mt-3">Redefinir senha</button>
                                         </center>
                                     </form>
 
                                     <p class="text-center mt-5 small">
-                                        Se você não criou uma conta com seu email, clique 
-                                            <a href="cancel_signup.php?confirmation_code=<?php echo !empty($_REQUEST['confirmation_code']) ? $_REQUEST['confirmation_code'] : "" ?>">aqui</a>
-                                        para excluir o acesso
+                                        Se você não solicitou a redefinição, não altere a senha
                                     </p>
                                 <?php
                                 }
-                                else if(!$check_confirmation_code)
+                                else if($error == 0 && $submit == "submit")
                                 {
                                 ?>
-                                    <h3 class="card-title p-2 text-center">Código de confirmação inválido!</h3>
+                                    <h3 class="card-title p-2 text-center">Senha redefinida com sucesso!</h3>
                                 <?php
                                 }
                                 else if($error == 1)
                                 {
                                 ?>
-                                    <h3 class="card-title p-2 text-center">Conta confirmada com sucesso!</h3>
+                                    <h3 class="card-title p-2 text-center">Código de redefinição inválido!</h3>
                                 <?php
                                 }
                                 else
                                 {
                                 ?>
-                                    <h3 class="card-title p-2 text-center">Erro ao confirmar conta, tente novamente mais tarde!</h3>
+                                    <h3 class="card-title p-2 text-center">Erro ao redefinir senha, tente novamente mais tarde!</h3>
                                 <?php
                                 }
                                 ?>

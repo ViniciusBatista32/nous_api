@@ -2,8 +2,8 @@
 session_start();
 
 require_once "config.php";
-require "conn.php";
-require "api.php";
+require "functions/conn.php";
+require "functions/functions_api.php";
 
 $logoff     = isset($_REQUEST['logoff'])     ? $_REQUEST['logoff']     : NULL;
 

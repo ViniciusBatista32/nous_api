@@ -1,10 +1,10 @@
 <?php
 require "config.php";
-require "conn.php";
-require "api.php";
-require "user_functions.php";
+require "functions/conn.php";
+require "functions/functions_api.php";
+require "functions/functions_user.php";
+require "functions/email_sender.php";
 require "response.php";
-require "email_sender.php";
 
 $api_key  = isset($_REQUEST['api_key'])  ? $_REQUEST['api_key']  : NULL;
 $action   = isset($_REQUEST['action'])   ? $_REQUEST['action']   : NULL;
@@ -78,13 +78,21 @@ switch ($action) {
                             }
                             else
                             {
-                                echo json_encode(
-                                    array(
-                                        "request_status" => getStatusJson(0, 0, $action, FALSE),
-                                        "data" => $ret[0]
-                                    )
-                                );
-                                die();
+                                if($ret[0]["confirmed"] == 0)
+                                {
+                                    echo getStatusJson(2, 11, $action);
+                                    die();
+                                }
+                                else
+                                {
+                                    echo json_encode(
+                                        array(
+                                            "request_status" => getStatusJson(0, 0, $action, FALSE),
+                                            "data" => $ret[0]
+                                        )
+                                    );
+                                    die();
+                                }
                             }
                         }
                     }
@@ -149,7 +157,7 @@ switch ($action) {
                             else
                             {
                                 // send signup confirmation email
-                                $ret = signUpConfirmation($email, $ret);
+                                $ret = signUpConfirmationEmail($email, $ret);
 
                                 if($ret === false)
                                 {
@@ -164,6 +172,64 @@ switch ($action) {
                                     die();
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+    break;
+
+    case 'reset_password':
+        // check if email is empty
+        if(empty($email))
+        {
+            echo getStatusJson(2, 3, $action);
+            die();
+        }
+        else
+        {
+            $ret = readUser($email);
+
+            if($ret === false)
+            {
+                echo $server_error;
+                die();
+            }
+            else
+            {
+                if(!count($ret) > 0)
+                {
+                    echo getStatusJson(2, 4, $action);
+                    die();
+                }
+                else
+                {
+                    $stmt = Connection::getConn();
+                    $stmt->beginTransaction();
+
+                    $ret = resetPasswordCode($stmt, $email);
+
+                    if($ret === false)
+                    {
+                        $stmt->rollBack();
+                        echo $server_error;
+                        die();
+                    }
+                    else
+                    {
+                        $ret = resetPasswordEmail($email, $ret);
+
+                        if($ret === false)
+                        {
+                            $stmt->rollback();
+                            echo getStatusJson(1, 12, $action);
+                            die();
+                        }
+                        else
+                        {
+                            $stmt->commit();
+                            echo getStatusJson(0, 0, $action);
+                            die();
                         }
                     }
                 }

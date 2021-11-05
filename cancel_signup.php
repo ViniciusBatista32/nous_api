@@ -1,7 +1,7 @@
 <?php
 require "config.php";
-require "conn.php";
-require "user_functions.php";
+require "functions/conn.php";
+require "functions/functions_user.php";
 
 $confirmation_code = !empty($_REQUEST['confirmation_code']) ? $_REQUEST['confirmation_code'] : NULL;
 $submit            = !empty($_REQUEST['submit'])            ? $_REQUEST['submit']            : NULL;
