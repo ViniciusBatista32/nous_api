@@ -89,7 +89,7 @@ switch ($action) {
                                         array(
                                             "request_status" => getStatusJson(0, 0, $action, FALSE),
                                             "data" => $ret[0]
-                                        )
+                                        ),
                                     );
                                     die();
                                 }

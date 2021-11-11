@@ -1,5 +1,5 @@
 <?php
-function readUser($email = NULL, $password = NULL, $confirmation_code = NULL)
+function readUser($email = NULL, $password = NULL, $confirmation_code = NULL, $id = NULL)
 {
     $sql = "
     SELECT
@@ -19,6 +19,9 @@ function readUser($email = NULL, $password = NULL, $confirmation_code = NULL)
     if(!empty($confirmation_code))
         $sql .= " AND confirmation_code = :confirmation_code ";
 
+    if(!empty($id))
+        $sql .= " AND id = :id ";
+
     $stmt = Connection::getConn()->prepare($sql);
 
     if(!empty($email))
@@ -29,6 +32,9 @@ function readUser($email = NULL, $password = NULL, $confirmation_code = NULL)
 
     if(!empty($confirmation_code))
         $stmt->bindValue(":confirmation_code", $confirmation_code);
+
+    if(!empty($id))
+        $stmt->bindValue(":id", $id);
 
     if($stmt->execute() === false)
     {

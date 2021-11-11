@@ -55,6 +55,14 @@ function getErrorMessage($error_code)
             return "Reset password email can't be sented";
         break;
 
+        case 13:
+            return "User not informed";
+        break;
+        
+        case 14:
+            return "Invalid user";
+        break;
+
         default:
             return "";
         break;
@@ -78,6 +86,8 @@ function getErrorMessage($error_code)
  * @param int 10 Confirmation email can't be sented
  * @param int 11 Email not confirmed
  * @param int 12 Reset password email can't be sented
+ * @param int 13 User not informed
+ * @param int 14 Invalid user
  * @return String
 */
 function getStatusJson($status, $error_code, $action, $json = TRUE)
@@ -95,7 +105,7 @@ function getStatusJson($status, $error_code, $action, $json = TRUE)
             array(
                 "request_status" => $request_status,
                 "data" => array()
-            )
+            ),
         );
     }
     else
