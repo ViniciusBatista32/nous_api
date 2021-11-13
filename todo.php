@@ -2,7 +2,7 @@
 require "config.php";
 require "functions/conn.php";
 require "functions/functions_api.php";
-require "functions/functions_schedule.php";
+require "functions/functions_todo.php";
 require "functions/functions_user.php";
 require "response.php";
 
@@ -29,7 +29,7 @@ $user_id  = isset($_REQUEST['user_id'])  ? $_REQUEST['user_id']  : NULL;
 $server_error = getStatusJson(1, 1, $action);
 
 switch ($action) {
-    case 'get_user_schedule':
+    case 'get_user_todo':
         if(empty($user_id))
         {
             echo getStatusJson(2, 13, $action);
@@ -53,45 +53,19 @@ switch ($action) {
                 }
                 else
                 {
-                    $schedule_data = readSchedule(NULL, $user_id);
+                    $todo_data = readTodo(NULL, $user_id);
 
-                    if($schedule_data === false)
+                    if($todo_data === false)
                     {
                         echo $server_error;
                         die();
                     }
                     else
                     {
-                        $week = array("mon", "tue", "wed", "thu", "fri", "sat", "sun");
-
-                        $mon = array();
-                        $tue = array();
-                        $wed = array();
-                        $thu = array();
-                        $fri = array();
-                        $sat = array();
-                        $sun = array();
-                        
-                        foreach($schedule_data as $schedule)
-                            ${$week[$schedule["weekday"]]}[] = $schedule;
-
-                        $schedule_data = array();
-
-                        foreach($week as $day)
-                        {
-                            $sort_rule = array();
-
-                            foreach($$day as $schedule_index => $schedule_values)
-                                $sort_rule[$schedule_index] = $schedule_values["initial_time"];
-
-                            array_multisort($sort_rule, SORT_ASC, $$day);
-                            $schedule_data[] = $$day;
-                        }
-
                         echo json_encode(
                             array(
                                 "request_status" => getStatusJson(0, 0, $action, FALSE),
-                                "data" => $schedule_data
+                                "data" => $todo_data
                             ),
                         );
                         die();
