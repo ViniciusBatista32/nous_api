@@ -6,8 +6,8 @@ require "functions/functions_schedule.php";
 require "functions/functions_user.php";
 require "response.php";
 
-$api_key  = isset($_REQUEST['api_key'])  ? $_REQUEST['api_key']  : NULL;
-$action   = isset($_REQUEST['action'])   ? $_REQUEST['action']   : NULL;
+$api_key      = isset($_REQUEST['api_key'])      ? $_REQUEST['api_key']      : NULL;
+$action       = isset($_REQUEST['action'])       ? $_REQUEST['action']       : NULL;
 
 $check_api = checkApiKey($api_key);
 
@@ -17,7 +17,16 @@ if($check_api === false || !count($check_api) > 0)
     die();
 }
 
-$user_id  = isset($_REQUEST['user_id'])  ? $_REQUEST['user_id']  : NULL;
+$user_id      = isset($_REQUEST['user_id'])      ? $_REQUEST['user_id']      : NULL;
+
+$name         = isset($_REQUEST['name'])         ? $_REQUEST['name']         : NULL;
+$description  = isset($_REQUEST['description'])  ? $_REQUEST['description']  : NULL;
+$initial_time = isset($_REQUEST['initial_time']) ? $_REQUEST['initial_time'] : NULL;
+$final_time   = isset($_REQUEST['final_time'])   ? $_REQUEST['final_time']   : NULL;
+$color        = isset($_REQUEST['color'])        ? $_REQUEST['color']        : NULL;
+$icon         = isset($_REQUEST['icon'])         ? $_REQUEST['icon']         : NULL;
+$no_repeat    = isset($_REQUEST['no_repeat'])    ? $_REQUEST['no_repeat']    : NULL;
+$weekdays     = isset($_REQUEST['weekdays'])     ? $_REQUEST['weekdays']     : NULL;
 
 /**
  * Status:
@@ -99,6 +108,10 @@ switch ($action) {
                 }
             }
         }
+    break;
+
+    case 'create_user_schedule':
+        
     break;
     
     default:

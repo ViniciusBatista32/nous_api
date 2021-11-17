@@ -63,6 +63,14 @@ function getErrorMessage($error_code)
             return "Invalid user";
         break;
 
+        case 15:
+            return "Task not informed";
+        break;
+
+        case 16:
+            return "Invalid task id";
+        break;
+
         default:
             return "";
         break;
@@ -88,6 +96,8 @@ function getErrorMessage($error_code)
  * @param int 12 Reset password email can't be sented
  * @param int 13 User not informed
  * @param int 14 Invalid user
+ * @param int 15 Task not informed
+ * @param int 16 Invalid task id
  * @return String
 */
 function getStatusJson($status, $error_code, $action, $json = TRUE)

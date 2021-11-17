@@ -17,7 +17,9 @@ if($check_api === false || !count($check_api) > 0)
     die();
 }
 
-$user_id  = isset($_REQUEST['user_id'])  ? $_REQUEST['user_id']  : NULL;
+$user_id   = isset($_REQUEST['user_id'])   ? $_REQUEST['user_id']   : NULL;
+$task_id   = isset($_REQUEST['task_id'])   ? $_REQUEST['task_id']   : NULL;
+$completed = isset($_REQUEST['completed']) ? $_REQUEST['completed'] : NULL;
 
 /**
  * Status:
@@ -53,7 +55,7 @@ switch ($action) {
                 }
                 else
                 {
-                    $todo_data = readTodo(NULL, $user_id);
+                    $todo_data = readTodoTask(NULL, $user_id);
 
                     if($todo_data === false)
                     {
@@ -73,6 +75,140 @@ switch ($action) {
                 }
             }
         }
+    break;
+
+    case "check_todo_task":
+        if(empty($user_id))
+        {
+            echo getStatusJson(2, 13, $action);
+            die();
+        }
+        else
+        {
+            $ret = readUser(NULL, NULL, NULL, $user_id);
+
+            if($ret === false)
+            {
+                echo $server_error;
+                die();
+            }
+            else
+            {
+                if(!count($ret) > 0)
+                {
+                    echo getStatusJson(2, 14, $action);
+                    die();
+                }
+                else
+                {
+                    if(empty($task_id))
+                    {
+                        echo getStatusJson(2, 15, $action);
+                        die();
+                    }
+                    else
+                    {
+                        $todo_data = readTodoTask($task_id, $user_id);
+
+                        if($todo_data === false)
+                        {
+                            echo $server_error;
+                            die();
+                        }
+                        else
+                        {
+                            if(count($todo_data) <= 0)
+                            {
+                                echo getStatusJson(2, 16, $action);
+                                die();
+                            }
+                            else
+                            {
+                                $ret = alterTodoTask($task_id, $completed);
+
+                                if($ret === false)
+                                {
+                                    echo $server_error;
+                                    die();
+                                }
+                                else
+                                {
+                                    echo getStatusJson(0, 0, $action);
+                                    die();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    break;
+
+    case 'delete_todo_task':
+        if(empty($user_id))
+        {
+            echo getStatusJson(2, 13, $action);
+            die();
+        }
+        else
+        {
+            $ret = readUser(NULL, NULL, NULL, $user_id);
+
+            if($ret === false)
+            {
+                echo $server_error;
+                die();
+            }
+            else
+            {
+                if(!count($ret) > 0)
+                {
+                    echo getStatusJson(2, 14, $action);
+                    die();
+                }
+                else
+                {
+                    if(empty($task_id))
+                    {
+                        echo getStatusJson(2, 15, $action);
+                        die();
+                    }
+                    else
+                    {
+                        $todo_data = readTodoTask($task_id, $user_id);
+
+                        if($todo_data === false)
+                        {
+                            echo $server_error;
+                            die();
+                        }
+                        else
+                        {
+                            if(count($todo_data) <= 0)
+                            {
+                                echo getStatusJson(2, 16, $action);
+                                die();
+                            }
+                            else
+                            {
+                                $ret = deleteTodoTask($task_id, $completed);
+
+                                if($ret === false)
+                                {
+                                    echo $server_error;
+                                    die();
+                                }
+                                else
+                                {
+                                    echo getStatusJson(0, 0, $action);
+                                    die();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }    
     break;
     
     default:
