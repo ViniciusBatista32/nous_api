@@ -1,5 +1,5 @@
 <?php
-function readTodoTask($id = NULL, $user_id = NULL)
+function readTodoTask($task_id = NULL, $user_id = NULL)
 {
     $sql = "
     SELECT
@@ -10,16 +10,16 @@ function readTodoTask($id = NULL, $user_id = NULL)
         1 = 1
     ";
 
-    if(!empty($id))
-        $sql .= " AND id = :id ";
+    if(!empty($task_id))
+        $sql .= " AND id = :task_id ";
 
     if(!empty($user_id))
         $sql .= " AND user_id = :user_id ";
 
     $stmt = Connection::getConn()->prepare($sql);
 
-    if(!empty($id))
-        $stmt->bindValue(":id", $id);
+    if(!empty($task_id))
+        $stmt->bindValue(":task_id", $task_id);
 
     if(!empty($user_id))
         $stmt->bindValue(":user_id", $user_id);
@@ -34,25 +34,20 @@ function readTodoTask($id = NULL, $user_id = NULL)
     }
 }
 
-function alterTodoTask($id, $completed = NULL)
+function createTodoTask($user_id, $description)
 {
     $sql = "
-    UPDATE
+    INSERT INTO
         `" . DB_NAME . "`.`users_todo`
-    SET 
+        (user_id, description)
+    VALUES 
+        (:user_id, :description)
     ";
 
-    if(is_numeric($completed))
-        $sql .= " completed = :completed ";
-
-    $sql .= " WHERE id = :id ";
-    
     $stmt = Connection::getConn()->prepare($sql);
 
-    if(is_numeric($completed))
-        $stmt->bindValue(":completed", $completed);
-
-    $stmt->bindValue(":id", $id);
+    $stmt->bindValue(":user_id", $user_id);
+    $stmt->bindValue(":description", $description);
 
     if($stmt->execute() === false)
     {
@@ -64,42 +59,80 @@ function alterTodoTask($id, $completed = NULL)
     }
 }
 
-// function createTodo($variable)
-// {
-//     $sql = "
-//     INSERT INTO
-//         `" . DB_NAME . "`.`users_todo`
-//         (values)
-//     VALUES 
-//         (:bind variable)
-//     ";
+function editTodoTask($task_id, $user_id, $description)
+{
+    if(empty($description))
+        $description = "[Sem nome]";
 
-//     $stmt = Connection::getConn()->prepare($sql);
+    $sql = "
+    UPDATE
+        `" . DB_NAME . "`.`users_todo`
+    SET 
+        description = :description
+    WHERE
+        id = :task_id
+    AND
+        user_id = :user_id
+    ";
+    
+    $stmt = Connection::getConn()->prepare($sql);
 
-//     $stmt->bindValue(":bind variable", $variable);
+    $stmt->bindValue(":description", $description);
+    $stmt->bindValue(":task_id", $task_id);
+    $stmt->bindValue(":user_id", $user_id);
 
-//     if($stmt->execute() === false)
-//     {
-//         return false;
-//     }
-//     else
-//     {
-//         return true;
-//     }
-// }
+    if($stmt->execute() === false)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
 
-function deleteTodoTask($id)
+function checkTodoTask($task_id, $completed = NULL)
+{
+    $sql = "
+    UPDATE
+        `" . DB_NAME . "`.`users_todo`
+    SET 
+    ";
+
+    if(is_numeric($completed))
+        $sql .= " completed = :completed ";
+
+    $sql .= " WHERE id = :task_id ";
+    
+    $stmt = Connection::getConn()->prepare($sql);
+
+    if(is_numeric($completed))
+        $stmt->bindValue(":completed", $completed);
+
+    $stmt->bindValue(":task_id", $task_id);
+
+    if($stmt->execute() === false)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+function deleteTodoTask($task_id)
 {
     $sql = "
     DELETE FROM 
         `" . DB_NAME . "`.`users_todo`
     WHERE 
-        id = :id
+        id = :task_id
     ";
 
     $stmt = Connection::getConn()->prepare($sql);
 
-    $stmt->bindValue(":id", $id);
+    $stmt->bindValue(":task_id", $task_id);
 
     if($stmt->execute() === false)
     {

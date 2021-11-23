@@ -71,6 +71,14 @@ function getErrorMessage($error_code)
             return "Invalid task id";
         break;
 
+        case 17:
+            return "Invalid task time";
+        break;
+
+        case 18:
+            return "Task description not informed";
+        break;
+
         default:
             return "";
         break;
@@ -98,6 +106,8 @@ function getErrorMessage($error_code)
  * @param int 14 Invalid user
  * @param int 15 Task not informed
  * @param int 16 Invalid task id
+ * @param int 17 Invalid task time
+ * @param int 18 Task description not informed
  * @return String
 */
 function getStatusJson($status, $error_code, $action, $json = TRUE)
